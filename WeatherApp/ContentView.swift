@@ -42,8 +42,14 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
 
 struct ContentView: View {
     @StateObject var locationM = locationManagerC()
+    @State var Data = []
     init(){
         locationM.askForPerms()
+        let stringURL = "https://api.weather.gov/points/\(locationM.lat),\(locationM.lon)"
+        let url = URL(string: stringURL)!
+        let task = URLSession.shared.dataTask(with: url){ Data, response, error in
+            
+        }
     }
     var body: some View {
         Text("Hello, world! Here is your location if you allowed it: \(locationM.lon), \(locationM.lat)")
