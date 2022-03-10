@@ -6,56 +6,24 @@
 //
 
 import SwiftUI
-import CoreLocation
 
-var locationManager:CLLocationManager?
-
-class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
-    @Published var auth : CLAuthorizationStatus
-    @Published var lat = 0.0
-    @Published var lon = 0.0
-    
-    private let locationManager:CLLocationManager
-    
-    override init(){
-        locationManager = CLLocationManager()
-        auth = locationManager.authorizationStatus
-        
-        super.init()
-        locationManager.delegate = self
-        locationManager.startUpdatingLocation()
-        
-    }
-    func askForPerms(){
-        locationManager.requestWhenInUseAuthorization()
-    }
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        auth = locationManager.authorizationStatus
-    }
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let locations = locations.last {
-            lat = locations.coordinate.latitude
-            lon = locations.coordinate.longitude
-        }
-    }
-}
 
 struct ContentView: View {
     @StateObject var locationM = locationManagerC()
-    @State var Data = []
-    init(){
-        locationM.askForPerms()
-        let stringURL = "https://api.weather.gov/points/\(locationM.lat),\(locationM.lon)"
-        let url = URL(string: stringURL)!
-        let task = URLSession.shared.dataTask(with: url){ Data, response, error in
+        init() {
+            locationM.askForPerms()
+            setUpMain()
             
         }
-    }
-    var body: some View {
-        Text("Hello, world! Here is your location if you allowed it: \(locationM.lon), \(locationM.lat)")
+        var body: some View {
+            Text("Hello, world! Here is your location if you allowed it: \(locationM.lon), \(locationM.lat)")
             .padding()
-    }
+            Text("Temperature today: " + tDat.temp)
+        }
+        //temp = locationM.todayDict?["temperature"] as! String
+        //Request HTTP data grab data and then parse JSON data.
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
