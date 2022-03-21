@@ -7,16 +7,24 @@
 
 import SwiftUI
 
-
 struct ContentView: View {
     @StateObject var locationM = locationManagerC()
     init(){
         locationM.askForPerms()
-        setUpMain()
+        Task.init{
+            await weatherModel.setUpMain(){ result in
+                switch result{
+                case .success(let weatherDat):
+                    await weatherModel.setUpToday()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
     }
     var body: some View {
-            TabView {
-                NavigationLazyView(TodayView())
+        TabView {
+                TodayView()
                     .tabItem{
                         VStack{
                             Image(systemName: "sun.and.horizon")
