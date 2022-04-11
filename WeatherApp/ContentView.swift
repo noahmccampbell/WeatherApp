@@ -8,20 +8,39 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var locationM = locationManagerC()
-    init(){
+        init(){
         locationM.askForPerms()
-        Task.init{
-            await weatherModel.setUpMain(){ result in
-                switch result{
-                case .success(let weatherDat):
-                    await weatherModel.setUpToday()
-                case .failure(let error):
-                    print(error)
+        locationM.lat = 37.0213
+        locationM.lon = -76.6803
+        print("Wow")
+        Task{
+            print("Wa2")
+            //Waits for the weather to be set up and pulled from the internet.
+            await weatherModel.setUpMain(lati: Float(locationM.lat), long: Float(locationM.lon)){ result in
+                print(result)
+                //current status of the asynchronus task. Basically if it is completed or not
+                    switch result{
+                    case .success(let weatherDat):
+                        await weatherModel.setUpToday(MainData: weatherDat){ today in
+                            switch today{
+                            //On success it runs the formatting function with the data pullet from the setting up function
+                            case .success(let todayDat):
+                                weatherModel.formatTodayData(todayData: todayDat)
+                                weatherModel.formatWeekData(todayData: todayDat)
+                            //If something goes wrong with pulling data from the internet
+                            case .failure(let error):
+                                print(error)
+                            }
+                                
+                            }
+                            pulledTodayDat = true
+                        case .failure(let error):
+                            print(error)
+                        }
+                    }
                 }
-            }
+
         }
-    }
     var body: some View {
         TabView {
                 TodayView()

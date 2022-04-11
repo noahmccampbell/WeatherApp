@@ -8,8 +8,23 @@
 import SwiftUI
 
 struct WeekView: View {
+    @ObservedObject var weather = weatherModel
+    @ObservedObject var locationServices = locationM
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack{
+            Form{
+                Section("This Week"){
+                    List{
+                        ForEach(Week, id: \.self){ day in
+                            HStack{
+                                Text("\(day.temp)°F")
+                                Text(day.shortforecast)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -9,9 +9,11 @@ import SwiftUI
 
 struct TodayView: View {
     @State var tDat = weatherModel.tDat
-    
+    @ObservedObject var weather = weatherModel
+    @ObservedObject var locationServices = locationM
     var body: some View {
         VStack{
+            Text("\(locationM.lat), \(locationM.lon)")
             Spacer()
             VStack{
             Text("Today")
@@ -58,9 +60,16 @@ struct TodayView: View {
             Spacer()
         }
         .task {
+            if(pulledTodayDat){
+                weatherModel.formatTodayData(todayData: formattedDataB)
+            }
             tDat = weatherModel.tDat
+            
         }
         .refreshable {
+            if(pulledTodayDat){
+                weatherModel.formatTodayData(todayData: formattedDataB)
+            }
             tDat = weatherModel.tDat
         }
     }

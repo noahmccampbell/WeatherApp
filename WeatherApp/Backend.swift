@@ -16,7 +16,7 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     @Published var auth : CLAuthorizationStatus
     @Published var lat = 0.0
     @Published var lon = 0.0
-    
+    @Published var didGetLocation = false
     private let locationManager:CLLocationManager
     
     override init(){
@@ -35,12 +35,36 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     //set authentication status
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         auth = locationManager.authorizationStatus
+        switch auth{
+        case .authorizedWhenInUse:
+            hasCLAuth = true
+        case .denied:
+            hasCLAuth = false
+        case .notDetermined:
+            hasCLAuth = false
+        case .restricted:
+            hasCLAuth = false
+        default:
+            hasCLAuth = false
+        }
     }
     //Set latitude and longitude through grabbed locations.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let locations = locations.last {
             lat = locations.coordinate.latitude
             lon = locations.coordinate.longitude
+            gotLocationData = true
+        }
+    }
+    func throwOut(coords: [Double], completion: @escaping(Result<[Double], Error>) async -> Void) async{
+        Task{
+            do{
+            if coords.count == 2 {
+                await completion(.success(coords))
+            }
+            } catch{
+                print(error)
+            }
         }
     }
     
@@ -52,7 +76,7 @@ var todayDict: NSDictionary?
 */
 
 //Todays WeatherData
-struct TodayData {
+struct TodayData:Hashable{
     var temp:String
     var forecast:String
     var shortforecast:String
@@ -92,57 +116,87 @@ class WeatherModel: NSObject, ObservableObject{
     @Published var todayDict: NSDictionary?
     @Published var tDat = TodayData.init(temp: "Undefined", forecast: "Undefined", shortforecast: "Undefined", weatherIconURL: "Undefined")
     
-    func GrabDataMain(urls:String) async throws -> NSDictionary{
+    //Aysynchronusly takes and url and returns the data from it in a dictionary.
+    func GrabDataMain(urls: String) async throws -> NSDictionary{
+        print("got main")
         let session = URLSession.shared
-        let jsonDecoder = JSONDecoder()
-        let url = URL(string: urls)!
-        let (data, _) = try await session.data(from: url)
-        return try (JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? NSDictionary)!
+        var data:Data?
+        if let url = URL(string: urls){
+            (data, _) = try await session.data(from: url)
+            print(urls)
+        }
+        return try (JSONSerialization.jsonObject(with: data!, options: .fragmentsAllowed) as? NSDictionary)!
+        
     }
-    func setUpMain(completion: @escaping (Result<NSDictionary, Error>) async -> Void) async{
+    //GRABS MAIN WEATHER DATA JSON
+    func setUpMain(lati: Float, long: Float, completion: @escaping (Result<NSDictionary, Error>) async -> Void) async{
         Task{
             do{
-                let weatherDat = try await GrabDataMain(urls: "https://api.weather.gov/points/39.8992,-77.6805")["properties"] as? NSDictionary
-                self.weatherDictionary = weatherDat
-                await completion(.success(weatherDat!))
+                print("got 1")
+                let weatherDat = try await GrabDataMain(urls: "https://api.weather.gov/points/\(lati),\(long)") as? NSDictionary
+                print(weatherDat)
+                self.weatherDictionary = weatherDat?["properties"] as! NSDictionary
+                await completion(.success(weatherDat?["properties"] as! NSDictionary))
                 
             } catch{
                 await completion(.failure(error))
             }
         }
     }
-    func setUpToday() async{
-        Task.init{
+    //Grabs and formats todays current data
+    func setUpToday(MainData: NSDictionary,completion: @escaping (Result<NSDictionary, Error>) async ->  Void) async{
+        Task{
         do{
-        
-            self.weatherDictionary = try await GrabDataMain(urls: self.weatherDictionary?["forecast"] as! String)
-            print(self.weatherDictionary?["forecast"])
-            if let periods = weatherDictionary?["periods"] {
-                self.todayDict = (periods as! NSArray)[0] as? NSDictionary
-                //Set Temp Var
-                self.tDat.temp = String(todayDict?["temperature"] as! Int)
-                //Set short Forecast
-                self.tDat.shortforecast = todayDict?["shortForecast"] as! String
-                //Set Detailed Forecast
-                self.tDat.forecast = todayDict?["detailedForecast"] as! String
-                //Set Icon Image URL
-                self.tDat.weatherIconURL = todayDict?["icon"] as! String
-                //print out temperature debug test.
-                print(String(todayDict?["temperature"] as! Int))
-                
-            } else{
-                //If parsing fails.
-                print("Cannot convert to NSArray?")
-            }
-        } catch{
-            print(error)
+            print("got 2")
+            let todayDat = try await GrabDataMain(urls: MainData["forecast"] as! String)
+            print(MainData["forecast"])
+            print(todayDat)
+            formattedDataB = todayDat["properties"] as! NSDictionary
+            await completion(.success(todayDat["properties"] as! NSDictionary))
+        }catch{
+            await completion(.failure(error))
         }
+    }
+}
+    //This goes through the data gathered and gets data from each "key" which is essentially just a variable name.
+    func formatTodayData(todayData: NSDictionary?){
+        if let periods = todayData?["periods"] {
+            self.todayDict = (periods as! NSArray)[0] as? NSDictionary
+            //Set Temp Var
+            self.tDat.temp = String(todayDict?["temperature"] as! Int)
+            //Set short Forecast
+            self.tDat.shortforecast = todayDict?["shortForecast"] as! String
+            //Set Detailed Forecast
+            self.tDat.forecast = todayDict?["detailedForecast"] as! String
+            //Set Icon Image URL
+            self.tDat.weatherIconURL = todayDict?["icon"] as! String
+            //print out temperature debug test.
+            print(String(todayDict?["temperature"] as! Int))
+            
+        } else{
+            //If parsing fails.
+            print("Cannot convert to NSArray?")
+        }
+    }
+    func formatWeekData(todayData:NSDictionary?){
+        if let periods = todayData?["periods"]{
+            for day in periods as! NSArray {
+                let NS = day as? NSDictionary
+                let dayData = TodayData.init(temp: String(NS?["temperature"] as! Int), forecast: NS?["detailedForecast"] as! String, shortforecast: NS?["shortForecast"] as! String, weatherIconURL: NS?["icon"] as! String)
+                Week.append(dayData)
+            }
         }
     }
 }
 
-
+//Backend initialization of all classes and variables needed for the data to be pulled on start
 var weatherModel = WeatherModel()
+var locationM = locationManagerC()
+var formattedDataB:NSDictionary?
+var Week:[TodayData] = []
+var pulledTodayDat = false
+var hasCLAuth = false
+var gotLocationData = false
 /*
 func setUpMain() {
     
