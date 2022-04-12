@@ -13,8 +13,6 @@ struct TodayView: View {
     @ObservedObject var locationServices = locationM
     var body: some View {
         VStack{
-            Text("\(locationM.lat), \(locationM.lon)")
-            Spacer()
             VStack{
             Text("Today")
                 .font(.system(size: 65.0))
@@ -28,6 +26,7 @@ struct TodayView: View {
                     case .success(let image):
                         image.resizable()
                             .scaledToFit()
+                            .padding()
                             .frame(maxWidth: 200, maxHeight: 200)
                     case .failure:
                             Image(systemName: "photo")
@@ -45,8 +44,12 @@ struct TodayView: View {
             Text("\(tDat.temp)°F")
                 .font(.system(size: 65.0))
                 .bold()
-                Text(tDat.shortforecast)
-                .font(.system(size: 35.0))
+                .scaledToFit()
+            Text(tDat.shortforecast)
+                .font(.system(size: 30.0))
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .scaledToFit()
             Spacer()
             }
             //Desc. Forecast
@@ -54,6 +57,7 @@ struct TodayView: View {
                 .font(.system(size: 25.0))
                 .bold()
                 .padding()
+                .scaledToFit()
             Text(tDat.forecast)
                 .font(.system(size: 20.0))
                 .padding()

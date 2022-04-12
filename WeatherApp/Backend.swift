@@ -19,6 +19,7 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     @Published var didGetLocation = false
     private let locationManager:CLLocationManager
     
+    //Initalizes and starts location services on start of app
     override init(){
         locationManager = CLLocationManager()
         auth = locationManager.authorizationStatus
@@ -32,7 +33,7 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     func askForPerms(){
         locationManager.requestWhenInUseAuthorization()
     }
-    //set authentication status
+    //Set authentication status
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         auth = locationManager.authorizationStatus
         switch auth{
@@ -48,7 +49,7 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
             hasCLAuth = false
         }
     }
-    //Set latitude and longitude through grabbed locations.
+    //Set latitude and longitude through grabbed locations(Activates when it has detected a location or you have moved).
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let locations = locations.last {
             lat = locations.coordinate.latitude
@@ -56,18 +57,6 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
             gotLocationData = true
         }
     }
-    func throwOut(coords: [Double], completion: @escaping(Result<[Double], Error>) async -> Void) async{
-        Task{
-            do{
-            if coords.count == 2 {
-                await completion(.success(coords))
-            }
-            } catch{
-                print(error)
-            }
-        }
-    }
-    
 }
 
 /*
@@ -81,10 +70,9 @@ struct TodayData:Hashable{
     var forecast:String
     var shortforecast:String
     var weatherIconURL:String
+    var name:String
 }
-//Initializers for all Weather Data Structures
-
-//GET Wrapper Start JSON file.
+//OLD CODE
 /*
 func getWeatherData(urls: String, completion: @escaping (_ json: Any?, _ error: Error?)->()) {
     let session = URLSession.shared
@@ -110,21 +98,23 @@ func getWeatherData(urls: String, completion: @escaping (_ json: Any?, _ error: 
     sessionData.resume()
 }
  */
-
+//Main Weather Grabbing and Formatting Operations
 class WeatherModel: NSObject, ObservableObject{
     @Published var weatherDictionary: NSDictionary?
     @Published var todayDict: NSDictionary?
-    @Published var tDat = TodayData.init(temp: "Undefined", forecast: "Undefined", shortforecast: "Undefined", weatherIconURL: "Undefined")
+    @Published var tDat = TodayData.init(temp: "Undefined", forecast: "Undefined", shortforecast: "Undefined", weatherIconURL: "Undefined", name:"undefined")
     
     //Aysynchronusly takes and url and returns the data from it in a dictionary.
     func GrabDataMain(urls: String) async throws -> NSDictionary{
         print("got main")
+        //Starts a session that can be used to get data
         let session = URLSession.shared
         var data:Data?
         if let url = URL(string: urls){
             (data, _) = try await session.data(from: url)
             print(urls)
         }
+        //returns data
         return try (JSONSerialization.jsonObject(with: data!, options: .fragmentsAllowed) as? NSDictionary)!
         
     }
@@ -182,7 +172,7 @@ class WeatherModel: NSObject, ObservableObject{
         if let periods = todayData?["periods"]{
             for day in periods as! NSArray {
                 let NS = day as? NSDictionary
-                let dayData = TodayData.init(temp: String(NS?["temperature"] as! Int), forecast: NS?["detailedForecast"] as! String, shortforecast: NS?["shortForecast"] as! String, weatherIconURL: NS?["icon"] as! String)
+                let dayData = TodayData.init(temp: String(NS?["temperature"] as! Int), forecast: NS?["detailedForecast"] as! String, shortforecast: NS?["shortForecast"] as! String, weatherIconURL: NS?["icon"] as! String, name: NS?["name"] as! String)
                 Week.append(dayData)
             }
         }

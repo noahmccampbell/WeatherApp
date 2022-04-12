@@ -4,6 +4,7 @@
 //
 //  Created by Noah Riley McCampbell (Student) on 2/8/22.
 //
+//DISCLAIMER: THIS APP IS NOT PERFECT THERE MAY STILL BE UNTESTED BUGS IT IS LIABLE TO FAIL.
 
 import SwiftUI
 
@@ -66,8 +67,6 @@ struct ContentView: View {
                     }
                 }
         }
-        //temp = locationM.todayDict?["temperature"] as! String
-        //Request HTTP data grab data and then parse JSON data.
 }
 
 
