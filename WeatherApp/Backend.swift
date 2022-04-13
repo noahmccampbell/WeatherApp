@@ -72,6 +72,12 @@ struct TodayData:Hashable{
     var weatherIconURL:String
     var name:String
 }
+struct HourData:Hashable{
+    var temp:Int
+    var shortforecast:String
+    var weatherIconURL:String
+    var startTime:String
+}
 //OLD CODE
 /*
 func getWeatherData(urls: String, completion: @escaping (_ json: Any?, _ error: Error?)->()) {
@@ -148,6 +154,19 @@ class WeatherModel: NSObject, ObservableObject{
         }
     }
 }
+    func setUpHourly(MainData: NSDictionary,completion: @escaping (Result<NSDictionary, Error>) async ->  Void) async{
+        Task{
+        do{
+            print("got 2")
+            let hourlyDat = try await GrabDataMain(urls: MainData["forecastHourly"] as! String)
+            print(MainData["forecastHourly"])
+            formattedDataB = hourlyDat["properties"] as! NSDictionary
+            await completion(.success(hourlyDat["properties"] as! NSDictionary))
+        }catch{
+            await completion(.failure(error))
+        }
+    }
+}
     //This goes through the data gathered and gets data from each "key" which is essentially just a variable name.
     func formatTodayData(todayData: NSDictionary?){
         if let periods = todayData?["periods"] {
@@ -177,6 +196,21 @@ class WeatherModel: NSObject, ObservableObject{
             }
         }
     }
+    func formatHourlyData(hourlyData:NSDictionary?){
+        if let hours = hourlyData?["periods"]{
+            for hour in hours as! NSArray{
+                let NS = hour as? NSDictionary
+                var hourData = HourData.init(temp: NS?["temperature"] as! Int, shortforecast: NS?["shortForecast"] as! String, weatherIconURL: NS?["icon"] as! String, startTime: NS?["startTime"] as! String)
+                let strArr = hourData.startTime.components(separatedBy: CharacterSet.decimalDigits.inverted)
+                hourData.startTime = strArr[0]
+                
+                //Start code for making time into actual normal AM PM time stamp
+                
+                Hours.append(hourData)
+                
+            }
+        }
+    }
 }
 
 //Backend initialization of all classes and variables needed for the data to be pulled on start
@@ -184,9 +218,11 @@ var weatherModel = WeatherModel()
 var locationM = locationManagerC()
 var formattedDataB:NSDictionary?
 var Week:[TodayData] = []
+var Hours:[HourData] = []
 var pulledTodayDat = false
 var hasCLAuth = false
 var gotLocationData = false
+
 /*
 func setUpMain() {
     

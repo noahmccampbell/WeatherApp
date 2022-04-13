@@ -34,6 +34,17 @@ struct ContentView: View {
                             }
                                 
                             }
+                        await weatherModel.setUpHourly(MainData: weatherDat){
+                            hourly in
+                            switch hourly{
+                            case .success(let hourlyDat):
+                                print(hourlyDat)
+                                weatherModel.formatHourlyData(hourlyData: hourlyDat)
+                                print(NSDate.now)
+                            case .failure(let error):
+                                print(error)
+                            }
+                        }
                             pulledTodayDat = true
                         case .failure(let error):
                             print(error)
