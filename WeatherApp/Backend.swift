@@ -202,13 +202,25 @@ class WeatherModel: NSObject, ObservableObject{
                 let NS = hour as? NSDictionary
                 var hourData = HourData.init(temp: NS?["temperature"] as! Int, shortforecast: NS?["shortForecast"] as! String, weatherIconURL: NS?["icon"] as! String, startTime: NS?["startTime"] as! String)
                 let strArr = hourData.startTime.components(separatedBy: CharacterSet.decimalDigits.inverted)
-                hourData.startTime = strArr[0]
+                hourData.startTime = strArr[3]
                 
                 //Start code for making time into actual normal AM PM time stamp
+                if Int(hourData.startTime)! > 12{
+                    hourData.startTime = "\(String(Int(hourData.startTime)! - 12)) PM"
+                }else if Int(hourData.startTime)! < 12{
+                    hourData.startTime = "\(String(Int(hourData.startTime)!)) AM"
+                }
+                else{
+                    hourData.startTime = "\(String(Int(hourData.startTime)!)) PM"
+                }
                 
                 Hours.append(hourData)
                 
             }
+            for i in 1...132 {
+                Hours.removeLast()
+            }
+            print("COunt of hours" + String(Hours.count))
         }
     }
 }
