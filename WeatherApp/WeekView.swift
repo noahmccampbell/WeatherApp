@@ -10,7 +10,12 @@ import SwiftUI
 struct WeekView: View {
     @ObservedObject var weather = weatherModel
     @ObservedObject var locationServices = locationM
+    private var topColor = Color(red: 1/255, green: 205/255, blue: 255/255)
+    private var centerColor = Color(red: 1/255, green: 231/255, blue: 255/255)
+    private var bottomColor = Color(red: 1/255, green: 154/255, blue: 255/255)
     var body: some View {
+        ZStack{
+        LinearGradient(colors: [topColor, centerColor, bottomColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
         VStack{
             ScrollView{
                 ForEach(Week, id: \.self){ day in
@@ -45,9 +50,11 @@ struct WeekView: View {
                         }
                         Text("\(day.temp)°F")
                             .padding()
-                    }.background(Color.secondary).clipShape(RoundedRectangle(cornerRadius: 5)).padding().lineLimit(1).minimumScaleFactor(0.75)
+                    }.background(LinearGradient(gradient: Gradient(colors: [self.bottomColor, Color.clear]), startPoint: .top, endPoint: .bottom).opacity(0.1))
+                        .background(Color.clear)
                 }
             }
+        }
         }
     }
 }

@@ -128,9 +128,7 @@ class WeatherModel: NSObject, ObservableObject{
     func setUpMain(lati: Float, long: Float, completion: @escaping (Result<NSDictionary, Error>) async -> Void) async{
         Task{
             do{
-                print("got 1")
                 let weatherDat = try await GrabDataMain(urls: "https://api.weather.gov/points/\(lati),\(long)") as? NSDictionary
-                print(weatherDat)
                 self.weatherDictionary = weatherDat?["properties"] as! NSDictionary
                 await completion(.success(weatherDat?["properties"] as! NSDictionary))
                 
@@ -180,7 +178,6 @@ class WeatherModel: NSObject, ObservableObject{
             //Set Icon Image URL
             self.tDat.weatherIconURL = todayDict?["icon"] as! String
             //print out temperature debug test.
-            print(String(todayDict?["temperature"] as! Int))
             
         } else{
             //If parsing fails.
@@ -207,20 +204,23 @@ class WeatherModel: NSObject, ObservableObject{
                 //Start code for making time into actual normal AM PM time stamp
                 if Int(hourData.startTime)! > 12{
                     hourData.startTime = "\(String(Int(hourData.startTime)! - 12)) PM"
-                }else if Int(hourData.startTime)! < 12{
+                }else if Int(hourData.startTime)! < 12 && Int(hourData.startTime)! > 0{
                     hourData.startTime = "\(String(Int(hourData.startTime)!)) AM"
-                }
-                else{
+                }else if Int(hourData.startTime) == 0{
+                    hourData.startTime = "12 AM"
+                }else{
                     hourData.startTime = "\(String(Int(hourData.startTime)!)) PM"
                 }
                 
+                if Int(hourData.startTime) == 0{
+                   hourData.startTime = "12 AM"
+                }
                 Hours.append(hourData)
                 
             }
             for i in 1...132 {
                 Hours.removeLast()
             }
-            print("COunt of hours" + String(Hours.count))
         }
     }
 }
