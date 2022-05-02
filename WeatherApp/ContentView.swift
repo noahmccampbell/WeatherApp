@@ -19,7 +19,7 @@ struct ContentView: View {
         //locationM.lat = 37.0213
         //locationM.lon = -76.6803
         print("Wow")
-        if(gotLocationData){
+        if(gotLocationData && gotLocationData){
         Task{
             print("Wa2")
             //Waits for the weather to be set up and pulled from the internet.
@@ -91,7 +91,7 @@ struct ContentView: View {
         case .loading:
             ProgressView()
                 .task{
-                if(hasCLAuth){
+                if(hasCLAuth && gotLocationData){
                     print("Wa2")
                     //Waits for the weather to be set up and pulled from the internet.
                     await weatherModel.setUpMain(lati: Float(locationM.lat), long: Float(locationM.lon)){ result in
