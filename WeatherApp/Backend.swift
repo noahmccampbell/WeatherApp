@@ -104,12 +104,16 @@ func getWeatherData(urls: String, completion: @escaping (_ json: Any?, _ error: 
     sessionData.resume()
 }
  */
+enum stateLoad {
+    case done
+    case loading
+    case fail(Error)
+}
 //Main Weather Grabbing and Formatting Operations
 class WeatherModel: NSObject, ObservableObject{
     @Published var weatherDictionary: NSDictionary?
     @Published var todayDict: NSDictionary?
     @Published var tDat = TodayData.init(temp: "Undefined", forecast: "Undefined", shortforecast: "Undefined", weatherIconURL: "Undefined", name:"undefined")
-    
     //Aysynchronusly takes and url and returns the data from it in a dictionary.
     func GrabDataMain(urls: String) async throws -> NSDictionary{
         print("got main")
