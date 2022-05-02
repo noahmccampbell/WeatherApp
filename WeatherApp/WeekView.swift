@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct WeekView: View {
+    //Observed objects for view to update on changes within object.
     @ObservedObject var weather = weatherModel
     @ObservedObject var locationServices = locationM
+    //Colors for linear gradient
     private var topColor = Color(red: 1/255, green: 205/255, blue: 255/255)
     private var centerColor = Color(red: 1/255, green: 231/255, blue: 255/255)
     private var bottomColor = Color(red: 1/255, green: 154/255, blue: 255/255)
@@ -50,6 +52,7 @@ struct WeekView: View {
                         }
                         Text("\(day.temp)°F")
                             .padding()
+                        //Linear gradient modifier
                     }.background(LinearGradient(gradient: Gradient(colors: [self.bottomColor, Color.clear]), startPoint: .top, endPoint: .bottom).opacity(0.1))
                         .background(Color.clear)
                 }

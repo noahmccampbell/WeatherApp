@@ -8,17 +8,19 @@
 import SwiftUI
 
 struct HourlyView: View {
+    //Linear Gradient Colors
     private var topColor = Color(red: 1/255, green: 205/255, blue: 255/255)
     private var centerColor = Color(red: 1/255, green: 231/255, blue: 255/255)
     private var bottomColor = Color(red: 1/255, green: 154/255, blue: 255/255)
     var body: some View {
-        
+        //ZStack for gradient background.
         ZStack{
             LinearGradient(colors: [topColor, centerColor, bottomColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
         VStack{
             ScrollView{
                 ForEach(Hours, id: \.self){ hour in
                     HStack{
+                        //Asynchronously get a Image not from Assests but URL.
                         AsyncImage(url:URL(string: hour.weatherIconURL), content: { image in
                         switch image {
                             case .empty:

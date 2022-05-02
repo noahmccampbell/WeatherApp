@@ -91,6 +91,7 @@ struct TodayView: View {
             Spacer()
             }
         }
+        //Task that continually runs in the background(make sure everything loads with no errors.)
         .task {
             if(pulledTodayDat){
                 weatherModel.formatTodayData(todayData: formattedDataB)
@@ -98,6 +99,7 @@ struct TodayView: View {
             tDat = weatherModel.tDat
             
         }
+        //Same thing as task above except on refresh.
         .refreshable {
             if(pulledTodayDat){
                 weatherModel.formatTodayData(todayData: formattedDataB)

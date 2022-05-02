@@ -12,6 +12,7 @@ import SwiftUI
 
 var locationManager:CLLocationManager?
 
+//Location Services Delegeate and handler
 class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     @Published var auth : CLAuthorizationStatus
     @Published var lat = 0.0
@@ -104,6 +105,7 @@ func getWeatherData(urls: String, completion: @escaping (_ json: Any?, _ error: 
     sessionData.resume()
 }
  */
+//enum for the state the app is currently in done(Finished getting data and can load view), loading(Currently grabbing and parsing data from API), fail(error occurred somewhere).
 enum stateLoad {
     case done
     case loading
@@ -202,10 +204,11 @@ class WeatherModel: NSObject, ObservableObject{
             for hour in hours as! NSArray{
                 let NS = hour as? NSDictionary
                 var hourData = HourData.init(temp: NS?["temperature"] as! Int, shortforecast: NS?["shortForecast"] as! String, weatherIconURL: NS?["icon"] as! String, startTime: NS?["startTime"] as! String)
+                //Parsing out the Time for the hourly forecast
                 let strArr = hourData.startTime.components(separatedBy: CharacterSet.decimalDigits.inverted)
                 hourData.startTime = strArr[3]
                 
-                //Start code for making time into actual normal AM PM time stamp
+                //Code for making time into actual normal AM PM time stamp
                 if Int(hourData.startTime)! > 12{
                     hourData.startTime = "\(String(Int(hourData.startTime)! - 12)) PM"
                 }else if Int(hourData.startTime)! < 12 && Int(hourData.startTime)! > 0{
@@ -222,6 +225,7 @@ class WeatherModel: NSObject, ObservableObject{
                 Hours.append(hourData)
                 
             }
+            //removed the other hours entries for the other days of the week, app only show the next 48 hours in the hourly menu
             for i in 1...132 {
                 Hours.removeLast()
             }
