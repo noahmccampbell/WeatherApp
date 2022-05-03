@@ -21,12 +21,15 @@ struct TodayView: View {
         ZStack{
             LinearGradient(colors: [topColor, centerColor, bottomColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
         VStack{
-            Spacer()
-            Text("Today")
-                .font(.system(size: 65.0))
-                .bold()
-                .padding()
-            Spacer()
+            Group{
+                Spacer()
+                Text("Today")
+                    .font(.system(size: 65.0))
+                    .bold()
+                    .padding()
+                Text("in \(locationM.whereAmi)")
+                Spacer()
+            }
             //Asynchronusly grabs an image and handles cases for different states of image loading.
             AsyncImage(url:URL(string: tDat.weatherIconURL), content: { image in
                 switch image {
@@ -47,15 +50,26 @@ struct TodayView: View {
                         EmptyView()
                     }
             })
-                
-            Spacer()
-            //ICON
-            Text("\(tDat.temp)°F")
-                .font(.system(size: 65.0))
-                .bold()
-            Spacer()
+            Group{
+                Spacer()
+                //ICON
+                Text("\(tDat.temp)°F")
+                    .font(.system(size: 65.0))
+                    .bold()
+                Spacer()
+            }
             Text(tDat.shortforecast)
                 .font(.system(size: 30.0))
+            /*
+            Group{
+                Divider()
+                Text(weather.tDat.forecast)
+                    .padding()
+                    
+                Divider()
+            }
+             */
+            Divider()
             LazyHStack(spacing: 34) {
                 if(!Hours.isEmpty){
                     ForEach(Hours[0...3], id: \.self){ content in
@@ -88,6 +102,7 @@ struct TodayView: View {
                     }
                 }
             }
+            Divider()
             Spacer()
             }
         }
@@ -97,7 +112,6 @@ struct TodayView: View {
                 weatherModel.formatTodayData(todayData: formattedDataB)
             }
             tDat = weatherModel.tDat
-            
         }
         //Same thing as task above except on refresh.
         .refreshable {

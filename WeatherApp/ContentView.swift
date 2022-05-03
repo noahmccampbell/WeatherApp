@@ -18,10 +18,10 @@ struct ContentView: View {
         locationM.askForPerms()
         //locationM.lat = 37.0213
         //locationM.lon = -76.6803
-        print("Wow")
-        if(gotLocationData && gotLocationData){
+        print("Init")
+        if(hasCLAuth || gotLocationData){
         Task{
-            print("Wa2")
+            print("Location Services authorized.")
             //Waits for the weather to be set up and pulled from the internet.
             await weatherModel.setUpMain(lati: Float(locationM.lat), long: Float(locationM.lon)){ result in
                 //current status of the asynchronus task. Basically if it is completed or not
@@ -56,7 +56,7 @@ struct ContentView: View {
                     }
                 }
             }
-            UITabBar.appearance().barTintColor = UIColor(centerColor)
+            UITabBar.appearance().barTintColor = UIColor(bottomColor)
         }
     var body: some View {
         switch stateLoading {
@@ -92,7 +92,7 @@ struct ContentView: View {
             ProgressView()
                 .task{
                 if(hasCLAuth && gotLocationData){
-                    print("Wa2")
+                    print("Location Services Authorized")
                     //Waits for the weather to be set up and pulled from the internet.
                     await weatherModel.setUpMain(lati: Float(locationM.lat), long: Float(locationM.lon)){ result in
                         //current status of the asynchronus task. Basically if it is completed or not

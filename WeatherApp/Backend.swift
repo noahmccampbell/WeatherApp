@@ -18,6 +18,7 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     @Published var lat = 0.0
     @Published var lon = 0.0
     @Published var didGetLocation = false
+    @Published var whereAmi = "in the Void"
     private let locationManager:CLLocationManager
     
     //Initalizes and starts location services on start of app
@@ -55,6 +56,10 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
         if let locations = locations.last {
             lat = locations.coordinate.latitude
             lon = locations.coordinate.longitude
+            CLGeocoder().reverseGeocodeLocation(locations) { f ,_ in
+                self.whereAmi = f?.first?.locality ?? "in the Void"
+                
+            }
             gotLocationData = true
         }
     }
@@ -181,6 +186,7 @@ class WeatherModel: NSObject, ObservableObject{
             self.tDat.shortforecast = todayDict?["shortForecast"] as! String
             //Set Detailed Forecast
             self.tDat.forecast = todayDict?["detailedForecast"] as! String
+            print(self.tDat.forecast)
             //Set Icon Image URL
             self.tDat.weatherIconURL = todayDict?["icon"] as! String
             //print out temperature debug test.
