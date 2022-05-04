@@ -19,6 +19,7 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
     @Published var lon = 0.0
     @Published var didGetLocation = false
     @Published var whereAmi = "in the Void"
+    @Published var regioncode = ""
     private let locationManager:CLLocationManager
     
     //Initalizes and starts location services on start of app
@@ -57,8 +58,8 @@ class locationManagerC : NSObject, ObservableObject, CLLocationManagerDelegate{
             lat = locations.coordinate.latitude
             lon = locations.coordinate.longitude
             CLGeocoder().reverseGeocodeLocation(locations) { f ,_ in
-                self.whereAmi = f?.first?.locality ?? "in the Void"
-                
+                self.whereAmi = f?.first?.locality ?? "Void"
+                self.regioncode = f?.first?.administrativeArea ?? ""
             }
             gotLocationData = true
         }

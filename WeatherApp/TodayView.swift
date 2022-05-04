@@ -27,7 +27,8 @@ struct TodayView: View {
                     .font(.system(size: 65.0))
                     .bold()
                     .padding()
-                Text("in \(locationM.whereAmi)")
+                Text("in \(locationM.whereAmi), \(locationM.regioncode)")
+                    .bold()
                 Spacer()
             }
             //Asynchronusly grabs an image and handles cases for different states of image loading.

@@ -56,7 +56,8 @@ struct ContentView: View {
                     }
                 }
             }
-            UITabBar.appearance().barTintColor = UIColor(bottomColor)
+        UITabBar.appearance().barTintColor = UIColor(bottomColor)
+        
         }
     var body: some View {
         switch stateLoading {
