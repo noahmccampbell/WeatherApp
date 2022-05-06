@@ -17,7 +17,7 @@ struct WeekView: View {
     private var bottomColor = Color(red: 1/255, green: 154/255, blue: 255/255)
     var body: some View {
         ZStack{
-        LinearGradient(colors: [topColor, centerColor, bottomColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
+        LinearGradient(colors: [bottomColor, bottomColor, topColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
         VStack{
             ScrollView{
                 ForEach(Week, id: \.self){ day in

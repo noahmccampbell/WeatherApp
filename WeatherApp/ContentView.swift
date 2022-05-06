@@ -16,8 +16,8 @@ struct ContentView: View {
     init(){
         
         locationM.askForPerms()
-        //locationM.lat = 37.0213
-        //locationM.lon = -76.6803
+        //locationM.lat = 39.899226
+        //locationM.lon = -77.680552
         print("Init")
         if(hasCLAuth || gotLocationData){
         Task{
@@ -56,7 +56,7 @@ struct ContentView: View {
                     }
                 }
             }
-        UITabBar.appearance().barTintColor = UIColor(bottomColor)
+        UITabBar.appearance().barTintColor = UIColor(centerColor)
         
         }
     var body: some View {

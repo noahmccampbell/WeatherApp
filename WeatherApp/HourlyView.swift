@@ -15,7 +15,7 @@ struct HourlyView: View {
     var body: some View {
         //ZStack for gradient background.
         ZStack{
-            LinearGradient(colors: [topColor, centerColor, bottomColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
+            LinearGradient(colors: [bottomColor, bottomColor, topColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
         VStack{
             ScrollView{
                 ForEach(Hours, id: \.self){ hour in

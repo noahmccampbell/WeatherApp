@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TodayView: View {
     //State variable handling TODAYS Data
+    @State private var animateGradient = false
     @State var tDat = weatherModel.tDat
     //Observing Objects to update view on changes and to access data of objects.
     @ObservedObject var weather = weatherModel
@@ -19,7 +20,8 @@ struct TodayView: View {
     private var bottomColor = Color(red: 1/255, green: 154/255, blue: 255/255)
     var body: some View {
         ZStack{
-            LinearGradient(colors: [topColor, centerColor, bottomColor], startPoint: .topLeading, endPoint: .bottom).edgesIgnoringSafeArea(.all)
+            LinearGradient(colors: [bottomColor, bottomColor, centerColor], startPoint: .topLeading, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
         VStack{
             Group{
                 Spacer()
